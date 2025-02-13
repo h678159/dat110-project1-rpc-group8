@@ -16,13 +16,9 @@ public class MessageConnection {
 	private Socket socket; // socket for the underlying TCP connection
 	
 	public MessageConnection(Socket socket) {
-
 		try {
-
 			this.socket = socket;
-
 			outStream = new DataOutputStream(socket.getOutputStream());
-
 			inStream = new DataInputStream (socket.getInputStream());
 
 		} catch (IOException ex) {
@@ -32,51 +28,29 @@ public class MessageConnection {
 		}
 	}
 
-	public void send(Message message) {
-
-		byte[] data;
-		
-		// TODO - START
-		// encapsulate the data contained in the Message and write to the output stream
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
-			
-		// TODO - END
+	public void send(Message message) throws IOException {
+		byte[] segment = MessageUtils.encapsulate(message);
+		outStream.write(segment);
+		outStream.flush(); 
 
 	}
 
-	public Message receive() {
-
-		Message message = null;
-		byte[] data;
-		
-		// TODO - START
-		// read a segment from the input stream and decapsulate data into a Message
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
-		
-		// TODO - END
-		
-		return message;
+	public Message receive() throws IOException {
+		byte[] segment = new byte[MessageUtils.SEGMENTSIZE]; 
+		inStream.readFully(segment); 
+		return MessageUtils.decapsulate(segment); 
 		
 	}
 
-	// close the connection by closing streams and the underlying socket	
 	public void close() {
-
-		try {
-			
-			outStream.close();
-			inStream.close();
-
-			socket.close();
-			
-		} catch (IOException ex) {
-
-			System.out.println("Connection: " + ex.getMessage());
-			ex.printStackTrace();
-		}
+	    try {
+	        if (outStream != null) outStream.close();
+	        if (inStream != null) inStream.close();
+	        if (socket != null) socket.close();
+	    } catch (IOException ex) {
+	        System.out.println("Error closing connection: " + ex.getMessage());
+	        ex.printStackTrace();
+	    }
 	}
+ 
 }

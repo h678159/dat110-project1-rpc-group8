@@ -6,10 +6,14 @@ import java.util.Arrays;
 public class RPCUtils {
 	
 	public static byte[] encapsulate(byte rpcid, byte[] payload) {
-		byte[] rpcmsg = new byte[1 + payload.length]; // Første byte er rpcid, resten er payload
-		rpcmsg[0] = rpcid; 
-		System.arraycopy(payload, 0, rpcmsg, 1, payload.length);
-		return rpcmsg;
+	    if (payload == null) {
+	        payload = new byte[0]; // Avoid null reference
+	    }
+
+	    byte[] rpcmsg = new byte[1 + payload.length];
+	    rpcmsg[0] = rpcid;
+	    System.arraycopy(payload, 0, rpcmsg, 1, payload.length);
+	    return rpcmsg;
 	}
 	
 	public static byte[] decapsulate(byte[] rpcmsg) {

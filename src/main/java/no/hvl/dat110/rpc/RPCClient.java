@@ -14,12 +14,7 @@ public class RPCClient {
 	}
 	
 	public void connect() {
-	    try {
-	        connection = msgclient.connect();
-	    } catch (IOException e) {
-	        System.out.println("Error connecting to server: " + e.getMessage());
-	        e.printStackTrace();
-	    }
+	    connection = msgclient.connect();
 	}
 
 	public void disconnect() {

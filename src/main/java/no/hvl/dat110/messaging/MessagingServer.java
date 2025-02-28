@@ -16,7 +16,7 @@ public class MessagingServer {
 
 		try {
 
-			this.welcomeSocket = new ServerSocket(8080);
+			this.welcomeSocket = new ServerSocket(port);
 
 		} catch (IOException ex) {
 

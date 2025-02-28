@@ -23,37 +23,45 @@ public class RPCServer {
 	public void run() {
 	    try {
 	        RPCRemoteImpl rpcstop = new RPCServerStopImpl(RPCCommon.RPIDSTOP, this);
-	        services.put(RPCCommon.RPIDSTOP, rpcstop); 
+	        services.put(RPCCommon.RPIDSTOP, rpcstop);
 
 	        System.out.println("RPC SERVER RUN - Services: " + services.size());
-	        connection = msgserver.accept(); 
-
-	        System.out.println("RPC SERVER ACCEPTED");
 
 	        boolean stop = false;
 
-	        while (!stop) {
-	            Message requestMsg = connection.receive(); 
-	            byte[] requestData = requestMsg.getData(); 
+	        while (!stop) {  // Hold serveren aktiv
+	            System.out.println("RPC SERVER WAITING FOR CONNECTION...");
+	            connection = msgserver.accept(); // Aksepter en ny tilkobling
 
-	            byte rpcid = requestData[0];
-	            byte[] payload = RPCUtils.decapsulate(requestData);
+	            System.out.println("RPC SERVER ACCEPTED");
 
-	            RPCRemoteImpl method = services.get(rpcid);
-	            byte[] replyData = method.invoke(payload);
+	            while (true) {
+	                Message requestMsg = connection.receive();
+	                byte[] requestData = requestMsg.getData();
 
-	            connection.send(new Message(RPCUtils.encapsulate(rpcid, replyData)));
+	                byte rpcid = requestData[0];
+	                byte[] payload = RPCUtils.decapsulate(requestData);
 
-	            if (rpcid == RPCCommon.RPIDSTOP) {
-	                stop = true;
+	                RPCRemoteImpl method = services.get(rpcid);
+	                byte[] replyData = method.invoke(payload);
+
+	                connection.send(new Message(RPCUtils.encapsulate(rpcid, replyData)));
+
+	                if (rpcid == RPCCommon.RPIDSTOP) {
+	                    stop = true;
+	                    break;  // Gå ut av indre løkke og vent på ny tilkobling
+	                }
 	            }
+
+	            connection.close(); // Lukk tilkoblingen før vi venter på en ny
 	        }
 	    } catch (IOException e) {
 	        System.out.println("IOException in RPCServer: " + e.getMessage());
 	        e.printStackTrace();
 	    } finally {
-	        stop(); // Lukk tilkoblingen når serveren stopper
+	        stop(); // Lukk alle ressurser når serveren stopper
 	    }
+	    
 	}
 
 	// used by server side method implementations to register themselves in the RPC server

@@ -16,7 +16,7 @@ public class MessagingServer {
 
 		try {
 
-			this.welcomeSocket = new ServerSocket(port);
+			this.welcomeSocket = new ServerSocket(8080);
 
 		} catch (IOException ex) {
 
@@ -38,17 +38,14 @@ public class MessagingServer {
 
 
 	public void stop() {
-
-		if (welcomeSocket != null) {
-
-			try {
-				welcomeSocket.close();
-			} catch (IOException ex) {
-
-				System.out.println("Messaging server: " + ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
+	    try {
+	        if (welcomeSocket != null && !welcomeSocket.isClosed()) {
+	            welcomeSocket.close(); // Lukk socketen ordentlig
+	        }
+	    } catch (IOException e) {
+	        System.out.println("Error closing welcome socket: " + e.getMessage());
+	    }
 	}
 
-}
+	}
+

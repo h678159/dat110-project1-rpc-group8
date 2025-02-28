@@ -34,12 +34,14 @@ class TestSystem {
         Thread sensorThread = new Thread(() -> {
             try {
                 SensorDevice.main(null);
+                Thread.sleep(Long.MAX_VALUE); // Holder sensorserveren aktiv
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 ready.countDown();
             }
         });
+
 
         Thread controllerThread = new Thread(() -> {
             try {
